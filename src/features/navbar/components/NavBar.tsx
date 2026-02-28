@@ -18,7 +18,7 @@ export default function NavBar() {
                 <NavigationMenuLink href="/login">Login</NavigationMenuLink>
             </NavigationMenuItem>
             <NavigationMenuItem>
-                <NavigationMenuLink href="/session/create">Create Session</NavigationMenuLink>
+                <NavigationMenuLink href="/sessions/create">Create Session</NavigationMenuLink>
             </NavigationMenuItem>
         </NavigationMenuList>
     </NavigationMenu>
