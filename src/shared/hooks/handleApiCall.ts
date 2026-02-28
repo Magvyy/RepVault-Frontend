@@ -9,7 +9,7 @@ interface HandleApiResponseProps {
     body?: string
 }
 export const useApiCall = <T extends Id> () => {
-    const [state, setState] = useState<ApiState<T>>({
+    const [state, setState] = useState<ApiState<T | string>>({
         called: false,
         loading: false,
         result: undefined
@@ -22,8 +22,8 @@ export const useApiCall = <T extends Id> () => {
                 loading: true,
                 result: undefined
             })
-            // const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-            // await sleep(1000)
+            const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+            await sleep(500)
             const response = (credentials)
                 ? await fetch(import.meta.env.VITE_API_URL + endpoint, {
                     credentials: "include",
@@ -43,13 +43,22 @@ export const useApiCall = <T extends Id> () => {
                     }
                 });
 
-            if (response.ok) {
+            if (response.status === 200) {
                 const responseJSON = await response.json();
                 setState({
                     called: true,
                     loading: false,
                     result: {
                         data: responseJSON,
+                        error: undefined
+                    }
+                });
+            } else if (response.status === 204) {
+                setState({
+                    called: true,
+                    loading: false,
+                    result: {
+                        data: "No content",
                         error: undefined
                     }
                 });
