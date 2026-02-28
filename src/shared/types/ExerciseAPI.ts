@@ -1,17 +1,20 @@
 import type { Id } from "./Common";
-import type { SetRequest, SetResponse } from "./SetAPI";
+import type { Set, SetRequest, SetResponse } from "./SetAPI";
 
-export type ExerciseEnum =
-    | "";
+export interface Exercise {
+    type: string
+    description: string
+    sets: Set[]
+}
 
 export interface ExerciseResponse extends Id {
-    exerciseType: ExerciseEnum
+    type: string
     description: string
     sets: SetResponse[]
 }
 
 export interface ExerciseRequest {
-    exerciseType: ExerciseEnum
+    type: string
     description: string
     sets: SetRequest[]
 }

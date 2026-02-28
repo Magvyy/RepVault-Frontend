@@ -7,14 +7,20 @@ export type SetEnum =
     | "DROP_SET"
     | "SUPER_SET";
 
+export interface Set {
+    type: SetEnum
+    reps: number
+    weight: number
+}
+
 export interface SetResponse extends Id {
-    setType: SetEnum
+    type: SetEnum
     reps: number
     weight: number
 }
 
 export interface SetRequest {
-    setType: SetEnum
+    type: SetEnum
     reps: number
     weight: number
 }
