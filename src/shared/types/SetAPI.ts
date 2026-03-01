@@ -1,13 +1,12 @@
+import { SetRequestDTOType } from "./ApiTypes";
 import type { Id } from "./Common";
 
-export type SetEnum =
-    | "NORMAL"
-    | "WARM_UP"
-    | "FAILURE"
-    | "DROP_SET"
-    | "SUPER_SET";
+export type SetEnum = typeof SetRequestDTOType[keyof typeof SetRequestDTOType];
+export const SetTypes = Object.values(SetRequestDTOType)
 
-export interface Set {
+export interface UISet {
+    clientId: string
+    id?: number
     type: SetEnum
     reps: number
     weight: number

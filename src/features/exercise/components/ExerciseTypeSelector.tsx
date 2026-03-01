@@ -1,14 +1,14 @@
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { SetTypes, type SetEnum } from "@/shared/types/SetAPI";
+import { ExerciseTypes, type ExerciseEnum } from "@/shared/types/ExerciseAPI";
 import clsx from "clsx";
 
 
-interface SetTypeSelectorProps {
-    type: SetEnum
-    setType: (type: SetEnum) => void
+interface ExerciseTypeSelectorProps {
+    type: ExerciseEnum
+    setType: (type: ExerciseEnum) => void
     className?: string
 }
-export function SetTypeSelector({ type, setType, className }: SetTypeSelectorProps) {
+export function ExerciseTypeSelector({ type, setType, className }: ExerciseTypeSelectorProps) {
     const CapitalizeFirstLetter = (word: string) => {
         return word.charAt(0).toUpperCase() + word.slice(1);
     }
@@ -16,14 +16,14 @@ export function SetTypeSelector({ type, setType, className }: SetTypeSelectorPro
     return(
         <Select
             defaultValue={type}
-            onValueChange={(value: string) => setType(value as SetEnum)}
+            onValueChange={(value: string) => setType(value as ExerciseEnum)}
         >
             <SelectTrigger className={clsx("base-class", className)}>
                 <SelectValue />
             </SelectTrigger>
             <SelectContent>
                 <SelectGroup>
-                    {SetTypes.map((type, key) => 
+                    {ExerciseTypes.map((type, key) => 
                         <SelectItem
                             key={key}
                             value={type}
