@@ -26,21 +26,21 @@ export const SetTableRow = React.memo(function SetTableRow({ set, updateSet, rem
                 <SetTypeSelector
                     type={set.type}
                     setType={(value) => updateSetField("type", value)}
-                    className="w-full"
+                    className="w-full border-none"
                 />
             </TableCell>
             <TableCell className={tableCellClassName}>
                 <SetWeightInput
                     weight={set.weight}
                     setWeight={(value) => updateSetField("weight", value)}
-                    className="w-full"
+                    className="w-full border-none text-center"
                 />
             </TableCell>
             <TableCell className={tableCellClassName}>
                 <SetRepsInput
                     reps={set.reps}
                     setReps={(value) => updateSetField("reps", value)}
-                    className="w-full"
+                    className="w-full border-none text-center"
                 />
             </TableCell>
             <TableCell className={tableCellClassName}>

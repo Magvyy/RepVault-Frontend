@@ -216,6 +216,7 @@ export interface components {
             sets?: components["schemas"]["SetRequestDTO"][];
         };
         SessionRequestDTO: {
+            name?: string;
             description?: string;
             exercises?: components["schemas"]["ExerciseRequestDTO"][];
         };
@@ -237,6 +238,7 @@ export interface components {
         SessionResponseDTO: {
             /** Format: int64 */
             id?: number;
+            name?: string;
             description?: string;
             exercises?: components["schemas"]["ExerciseResponseDTO"][];
             /** Format: date-time */

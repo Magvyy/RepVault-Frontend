@@ -10,7 +10,7 @@ interface SetTypeSelectorProps {
     className?: string
 }
 export function SetTypeSelector({ type, setType, className }: SetTypeSelectorProps) {
-    console.log("rerendered set type input");
+    // console.log("rerendered set type input");
 
     return(
         <Select

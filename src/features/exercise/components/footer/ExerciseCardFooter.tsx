@@ -15,7 +15,7 @@ export default function ExerciseCardFooter({ createNewSet, className }: Exercise
 
     return (
         <CardFooter className={clsx("base-class", className)}>
-            <Button variant="outline" className="w-full" onClick={createNewSet}>
+            <Button className="w-full" onClick={createNewSet}>
                 Add Set
             </Button>
         </CardFooter>

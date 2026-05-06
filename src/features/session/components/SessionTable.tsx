@@ -3,7 +3,7 @@ import { ExerciseCard } from "@/features/exercise";
 import { ExerciseTypes, type UIExercise } from "@/shared/types/ExerciseAPI";
 import type { UISession } from "@/shared/types/SessionAPI";
 import type { SetEnum } from "@/shared/types/SetAPI";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 
 
@@ -29,7 +29,7 @@ export function SessionTable(props: SessionTableProps) {
         setSession(session);
     }, []);
 
-    const createNewExercise = () => {
+    const createNewExercise = useCallback(() => {
         const newExercise = {
             clientId: crypto.randomUUID(),
             type: ExerciseTypes[0],
@@ -41,34 +41,32 @@ export function SessionTable(props: SessionTableProps) {
                 weight: 0
             }]
         }
-        updateSessionField("exercises", [...session.exercises, newExercise]);
-    }
+        setSession(prev => ({...prev, exercises: [...prev.exercises, newExercise]}))
+    }, [setSession])
 
-    const updateSessionField = <K extends keyof UISession>(key: K, value: UISession[K]) => {
-        setSession({ ...session, [key]: value });
-    }
-
-    const updateExercise = (exercise: UIExercise) => {
-        updateSessionField("exercises", session.exercises.map(elem => (elem.clientId === exercise.clientId) ? exercise : elem));
-    }
+    const updateExercise = useCallback((exercise: UIExercise) => {
+        setSession(prev => ({...prev, exercises: prev.exercises.map(elem => (elem.clientId === exercise.clientId) ? exercise : elem)}))
+    }, [setSession])
     
-    const removeExercise = (clientId: string) => {
-        updateSessionField("exercises", session.exercises.filter(elem => elem.clientId !== clientId));
-    }
+    const removeExercise = useCallback((clientId: string) => {
+        setSession(prev => ({...prev, exercises: prev.exercises.filter(elem => elem.clientId !== clientId)}))
+    }, [setSession])
     
     return (
-        <div className="flex flex-col gap-[30px]">
-            {session.exercises.map(exercise => 
-                <ExerciseCard
-                    key={exercise.clientId}
-                    exercise={exercise}
-                    updateExercise={updateExercise}
-                    removeExercise={removeExercise}
-                />
-            )}
+        <div className="flex flex-col w-4/5 gap-[30px]">
+            <div className="flex flex-wrap justify-center w-full gap-[30px]">
+                {session.exercises.map(exercise => 
+                    <ExerciseCard
+                        key={exercise.clientId}
+                        exercise={exercise}
+                        updateExercise={updateExercise}
+                        removeExercise={removeExercise}
+                    />
+                )}
+            </div>
             
             <div className="p-2 pt-4">
-                <Button className="w-full" onClick={createNewExercise}>
+                <Button className="w-fit" onClick={createNewExercise}>
                     Add Exercise
                 </Button>
             </div>
