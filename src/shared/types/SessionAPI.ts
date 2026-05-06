@@ -5,6 +5,7 @@ import type { UIExercise, ExerciseRequest, ExerciseResponse } from "./ExerciseAP
 export interface UISession {
     clientId: string
     id?: number
+    name: string
     description: string
     exercises: UIExercise[]
     start?: Temporal.ZonedDateTime
@@ -12,6 +13,7 @@ export interface UISession {
 }
 
 export interface SessionResponse extends Id {
+    name: string
     description: string
     exercises: ExerciseResponse[]
     start: Temporal.ZonedDateTime
@@ -19,6 +21,7 @@ export interface SessionResponse extends Id {
 }
 
 export interface SessionRequest {
+    name: string
     description: string
     exercises: ExerciseRequest[]
 }

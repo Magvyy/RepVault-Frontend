@@ -1,3 +1,3 @@
 
 
-export * from "./components/ExerciseTable";
+export * from "./components/ExerciseCard";

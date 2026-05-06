@@ -3,7 +3,7 @@ import type { Id } from "./Common";
 import type { UISet, SetRequest, SetResponse } from "./SetAPI";
 
 export type ExerciseEnum = typeof ExerciseRequestDTOType[keyof typeof ExerciseRequestDTOType];
-export const ExerciseTypes = Object.values(ExerciseRequestDTOType)
+export const ExerciseTypes = Object.values(ExerciseRequestDTOType);
 
 export interface UIExercise {
     clientId: string

@@ -1,9 +1,7 @@
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { ExerciseTable } from "@/features/exercise";
-import type { UIExercise } from "@/shared/types/ExerciseAPI";
+import { SessionTable } from "@/features/session";
+import { ExerciseTypes } from "@/shared/types/ExerciseAPI";
+import type { UISession } from "@/shared/types/SessionAPI";
+import type { SetEnum } from "@/shared/types/SetAPI";
 import { useState } from "react";
 
 
@@ -11,7 +9,22 @@ import { useState } from "react";
 
 
 export default function CreateSessionPage() {
-    const [exercises, setExercises] = useState<UIExercise[]>([]);
+    const [session, setSession] = useState<UISession>({
+        clientId: crypto.randomUUID(),
+        name: "",
+        description: "",
+        exercises: [{
+            clientId: crypto.randomUUID(),
+            type: ExerciseTypes[0],
+            description: "",
+            sets: [{
+                clientId: crypto.randomUUID(),
+                type: "NORMAL" as SetEnum,
+                reps: 0,
+                weight: 0
+            }]
+        }]
+    })
 
     const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
@@ -24,13 +37,9 @@ export default function CreateSessionPage() {
 
     return (
         <div className="w-full p-8 flex flex-col justify-center items-center">
-            <ExerciseTable/>
-            {exercises.map((exercise, key) => 
-                <ExerciseTable
-                    key={key}
-                    exercise={exercise}
-                />
-            )}
+            <SessionTable
+                session={session}
+            />
         </div>
     )
 }

@@ -1,56 +1,45 @@
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { SetTableRow } from "./SetTableRow";
-import type { UISet, SetEnum } from "@/shared/types/SetAPI";
-import { Button } from "@/components/ui/button";
+import type { UISet } from "@/shared/types/SetAPI";
+import React from "react";
 
 interface SetTableProps {
     sets: UISet[]
-    setSets: React.Dispatch<React.SetStateAction<UISet[]>>
+    setSets: (sets: UISet[]) => void
 }
-export function SetTable({ sets, setSets }: SetTableProps) {
-    const createNewSet = () => {
-        const newSet = {
-            clientId: crypto.randomUUID(),
-            type: "NORMAL" as SetEnum,
-            reps: 0,
-            weight: 0
-        }
-        setSets(prev => [...prev, newSet])
-    }
-
+export const SetTable = React.memo( function SetTable({ sets, setSets }: SetTableProps) {
     const updateSet = (set: UISet) => {
-        setSets(prev => prev.map(prevSet => {
-            if (prevSet.clientId === set.clientId) return set
-            else return prevSet
+        setSets(sets.map(elem => {
+            return (elem.clientId === set.clientId) ? set : elem
         }));
     }
 
+    const removeSet = (clientId: string) => {
+        setSets(sets.filter(elem => elem.clientId !== clientId));
+    }
+
+    const fractions = "[3fr_2fr_1fr_1fr]";
+
     return (
-        <div className="flex flex-col w-[400px] max-h-[400px]">
-            <Table>
-                <TableHeader className="sticky top-0 z-1 bg-white">
-                    <TableRow className={"w-full grid grid-cols-[2fr_1fr_1fr] gap-4 border-1 rounded-tl-[10px] rounded-tr-[10px]"}>
-                        <TableHead className="flex justify-start items-center px-4 py-0">Set</TableHead>
-                        <TableHead className="flex justify-start items-center px-4 py-0">Weight</TableHead>
-                        <TableHead className="flex justify-start items-center px-4 py-0">Reps</TableHead>
-                    </TableRow>
-                </TableHeader>
-                <TableBody>
-                    {sets.map((set, key) => 
-                        <SetTableRow
-                            key={key}
-                            set={set}
-                            updateSet={updateSet}
-                            className={"w-full grid grid-cols-[2fr_1fr_1fr] gap-4 !border-l-1 !border-r-1"}
-                        />
-                    )}
-                </TableBody>
-            </Table>
-            <div className="p-2 pt-4 border-1 rounded-bl-[10px] rounded-br-[10px]">
-                <Button className="w-full" onClick={createNewSet}>
-                    Add Set
-                </Button>
-            </div>
-        </div>
+        <Table className="flex flex-col w-[400px] max-h-[400px]">
+            <TableHeader className="sticky top-0 z-1 bg-white">
+                <TableRow className={`w-full grid grid-cols-${fractions} gap-4 border-1 rounded-tl-[10px] rounded-tr-[10px]`}>
+                    <TableHead className="flex justify-start items-center px-4 py-0">Set</TableHead>
+                    <TableHead className="flex justify-start items-center px-4 py-0">Weight (kg)</TableHead>
+                    <TableHead className="flex justify-start items-center px-4 py-0">Reps</TableHead>
+                </TableRow>
+            </TableHeader>
+            <TableBody>
+                {sets.map((set, key) => 
+                    <SetTableRow
+                        key={key}
+                        set={set}
+                        updateSet={updateSet}
+                        removeSet={removeSet}
+                        className={`w-full grid grid-cols-${fractions} gap-4 !border-l-1 !border-r-1`}
+                    />
+                )}
+            </TableBody>
+        </Table>
     )
-}
+})

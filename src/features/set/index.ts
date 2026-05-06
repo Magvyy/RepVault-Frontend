@@ -1,3 +1,2 @@
 
-
-export * from "./components/SetTableRow";
+export * from "./components/SetTable";

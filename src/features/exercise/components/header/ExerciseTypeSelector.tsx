@@ -1,4 +1,5 @@
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import formatEnumToString from "@/shared/services/formatEnumToString";
 import { ExerciseTypes, type ExerciseEnum } from "@/shared/types/ExerciseAPI";
 import clsx from "clsx";
 
@@ -9,13 +10,10 @@ interface ExerciseTypeSelectorProps {
     className?: string
 }
 export function ExerciseTypeSelector({ type, setType, className }: ExerciseTypeSelectorProps) {
-    const CapitalizeFirstLetter = (word: string) => {
-        return word.charAt(0).toUpperCase() + word.slice(1);
-    }
 
     return(
         <Select
-            defaultValue={type}
+            value={type}
             onValueChange={(value: string) => setType(value as ExerciseEnum)}
         >
             <SelectTrigger className={clsx("base-class", className)}>
@@ -28,7 +26,7 @@ export function ExerciseTypeSelector({ type, setType, className }: ExerciseTypeS
                             key={key}
                             value={type}
                         >
-                        {CapitalizeFirstLetter(type as string)}
+                        {formatEnumToString(type as string)}
                         </SelectItem>
                     )}
                 </SelectGroup>

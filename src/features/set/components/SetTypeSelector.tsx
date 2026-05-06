@@ -1,4 +1,5 @@
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import formatEnumToString from "@/shared/services/formatEnumToString";
 import { SetTypes, type SetEnum } from "@/shared/types/SetAPI";
 import clsx from "clsx";
 
@@ -9,13 +10,11 @@ interface SetTypeSelectorProps {
     className?: string
 }
 export function SetTypeSelector({ type, setType, className }: SetTypeSelectorProps) {
-    const CapitalizeFirstLetter = (word: string) => {
-        return word.charAt(0).toUpperCase() + word.slice(1);
-    }
+    console.log("rerendered set type input");
 
     return(
         <Select
-            defaultValue={type}
+            value={type}
             onValueChange={(value: string) => setType(value as SetEnum)}
         >
             <SelectTrigger className={clsx("base-class", className)}>
@@ -28,7 +27,7 @@ export function SetTypeSelector({ type, setType, className }: SetTypeSelectorPro
                             key={key}
                             value={type}
                         >
-                        {CapitalizeFirstLetter(type as string)}
+                        {formatEnumToString(type as string)}
                         </SelectItem>
                     )}
                 </SelectGroup>

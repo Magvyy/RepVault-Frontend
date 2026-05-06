@@ -9,12 +9,17 @@ interface SetWeightInputProps {
     className?: string
 }
 export function SetWeightInput({ weight, setWeight, className }: SetWeightInputProps) {
+    const max = 2000;
 
     return(
         <Input
             value={weight}
-            onChange={(e) => setWeight(Number(e.target.value))}
+            onChange={(e) => {
+                const weightNum = Number(e.target.value);
+                setWeight((weightNum < 2000) ? weightNum : max)
+            }}
             className={clsx("base-class", className)}
+            max={max}
         />
     )
 }
