@@ -1,6 +1,10 @@
-import { SessionTable } from "@/features/session";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { SessionTableInput } from "@/features/session";
+import { useApiCall } from "@/shared/hooks/handleApiCall";
+import { convet_to_API } from "@/shared/types/Common";
 import { ExerciseTypes } from "@/shared/types/ExerciseAPI";
-import type { UISession } from "@/shared/types/SessionAPI";
+import type { SessionRequest, UISession } from "@/shared/types/SessionAPI";
 import type { SetEnum } from "@/shared/types/SetAPI";
 import { useState } from "react";
 
@@ -9,14 +13,13 @@ import { useState } from "react";
 
 
 export default function CreateSessionPage() {
+    const { state, handleApiCall } = useApiCall<SessionRequest>()
     const [session, setSession] = useState<UISession>({
         clientId: crypto.randomUUID(),
         name: "",
-        description: "",
         exercises: [{
             clientId: crypto.randomUUID(),
             type: ExerciseTypes[0],
-            description: "",
             sets: [{
                 clientId: crypto.randomUUID(),
                 type: "NORMAL" as SetEnum,
@@ -26,20 +29,26 @@ export default function CreateSessionPage() {
         }]
     })
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-        event.preventDefault();
-        handleClick();
-    }
-
     const handleClick = () => {
-
+        handleApiCall({
+            endpoint: "/sessions/templates",
+            credentials: true,
+            method: "POST",
+            body: JSON.stringify(convet_to_API(session))
+        })
     }
 
     return (
-        <div className="w-full p-8 flex flex-col justify-center items-center">
-            <SessionTable
-                session={session}
+        <div className="w-full h-full p-8 flex flex-col justify-between items-center">
+            <Input
+                className="w-4/5 !bg-card"
+                onChange={(e) => setSession(prev => { return {...prev, name: e.target.value} })}
             />
+            <SessionTableInput
+                session={session}
+                setSession={setSession}
+            />
+            <Button onClick={handleClick}>Create Session Template</Button>
         </div>
     )
 }

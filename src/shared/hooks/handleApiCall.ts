@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { type ApiState, type Id } from "../types/Common";
+import { useState } from "react"
+import { type ApiState } from "../types/Common"
 
 
 interface HandleApiResponseProps {
@@ -8,12 +8,12 @@ interface HandleApiResponseProps {
     method: string
     body?: string
 }
-export const useApiCall = <T extends Id> () => {
+export const useApiCall = <T> () => {
     const [state, setState] = useState<ApiState<T | string>>({
         called: false,
         loading: false,
         result: undefined
-    });
+    })
 
     const handleApiCall = async ({ endpoint, credentials, method, body }: HandleApiResponseProps) => {
         try {
@@ -22,8 +22,8 @@ export const useApiCall = <T extends Id> () => {
                 loading: true,
                 result: undefined
             })
-            const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-            await sleep(500)
+            const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
+            await sleep(1000)
             const response = (credentials)
                 ? await fetch(import.meta.env.VITE_API_URL + endpoint, {
                     credentials: "include",
@@ -33,15 +33,15 @@ export const useApiCall = <T extends Id> () => {
                         "Accept": "application/json",
                         "Access-Control-Allow-Credentials": "true"
                     },
-                    body: (method === "POST") ? body : null
+                    body: (method === "POST" || method === "PUT") ? body : null
                 })
-                : await fetch(endpoint, {
+                : await fetch(import.meta.env.VITE_API_URL + endpoint, {
                     method: method,
                     headers: {
                         "Content-Type": "application/json",
                         "Accept": "application/json"
                     }
-                });
+                })
 
             if (response.status === 200) {
                 const responseJSON = await response.json();
@@ -52,7 +52,7 @@ export const useApiCall = <T extends Id> () => {
                         data: responseJSON,
                         error: undefined
                     }
-                });
+                })
             } else if (response.status === 204) {
                 setState({
                     called: true,
@@ -61,9 +61,9 @@ export const useApiCall = <T extends Id> () => {
                         data: "No content",
                         error: undefined
                     }
-                });
+                })
             } else {
-                const responseJSON = await response.json();
+                const responseJSON = await response.json()
                 setState({
                     called: true,
                     loading: false,
@@ -71,7 +71,7 @@ export const useApiCall = <T extends Id> () => {
                         data: undefined,
                         error: responseJSON.message
                     }
-                });
+                })
                     }
         } catch (err: any) {
             setState({
@@ -81,9 +81,9 @@ export const useApiCall = <T extends Id> () => {
                     data: undefined,
                     error: err.message
                 }
-            });
+            })
         }
     }
     
-    return { state, handleApiCall };
+    return { state, handleApiCall }
 }

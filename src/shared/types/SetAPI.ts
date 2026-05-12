@@ -1,12 +1,17 @@
 import { SetRequestDTOType } from "./ApiTypes";
-import type { Id } from "./Common";
+import type { Id, UI } from "./Common";
 
 export type SetEnum = typeof SetRequestDTOType[keyof typeof SetRequestDTOType];
 export const SetTypes = Object.values(SetRequestDTOType)
 
-export interface UISet {
-    clientId: string
+export interface UISet extends UI {
     id?: number
+    type: SetEnum
+    reps: number
+    weight: number
+}
+
+export interface UISetResponse extends UI, Id {
     type: SetEnum
     reps: number
     weight: number

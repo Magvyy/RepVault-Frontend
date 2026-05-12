@@ -1,54 +1,27 @@
-import { TableCell, TableRow } from "@/components/ui/table";
-import type { UISet } from "@/shared/types/SetAPI";
-import { SetTypeSelector } from "./SetTypeSelector";
-import { SetWeightInput } from "./SetWeightInput";
-import { SetRepsInput } from "./SetRepsInput";
-import clsx from "clsx";
-import Remover from "@/shared/components/Remover";
-import React from "react";
+import { TableCell, TableRow } from "@/components/ui/table"
+import formatEnumToString from "@/shared/services/formatEnumToString"
+import { type UISet } from "@/shared/types/SetAPI"
+import clsx from "clsx"
+import React from "react"
 
 interface SetTableRowProps {
     set: UISet
-    updateSet: (set: UISet) => void
-    removeSet: (clientId: string) => void
     className?: string
 }
-export const SetTableRow = React.memo(function SetTableRow({ set, updateSet, removeSet, className }: SetTableRowProps) {
-    const updateSetField = <K extends keyof UISet>(key: K, value: UISet[K]) => {
-        updateSet({ ...set, [key]: value })
-    }
+export const SetTableRow = React.memo(function SetTableRow({ set, className }: SetTableRowProps) {
 
-    const tableCellClassName = "flex justify-start";
+    const tableCellClassName = "flex justify-center"
     
     return(
         <TableRow className={clsx("base-class", className)}>
             <TableCell className={tableCellClassName}>
-                <SetTypeSelector
-                    type={set.type}
-                    setType={(value) => updateSetField("type", value)}
-                    className="w-full border-none"
-                />
+                {formatEnumToString(set.type)}
             </TableCell>
             <TableCell className={tableCellClassName}>
-                <SetWeightInput
-                    weight={set.weight}
-                    setWeight={(value) => updateSetField("weight", value)}
-                    className="w-full border-none text-center"
-                />
+                {set.weight}
             </TableCell>
             <TableCell className={tableCellClassName}>
-                <SetRepsInput
-                    reps={set.reps}
-                    setReps={(value) => updateSetField("reps", value)}
-                    className="w-full border-none text-center"
-                />
-            </TableCell>
-            <TableCell className={tableCellClassName}>
-                <Remover
-                    clientId={set.clientId}
-                    remove={removeSet}
-                    className="w-full"
-                />
+                {set.reps}
             </TableCell>
         </TableRow>
     )

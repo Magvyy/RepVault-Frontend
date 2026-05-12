@@ -29,7 +29,7 @@ export interface paths {
         };
         get: operations["readSession"];
         put: operations["updateSession"];
-        post: operations["endSession"];
+        post?: never;
         delete: operations["deleteSession"];
         options?: never;
         head?: never;
@@ -52,7 +52,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/sessions": {
+    "/sessions/active/{id}": {
         parameters: {
             query?: never;
             header?: never;
@@ -60,9 +60,9 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
-        put?: never;
-        post: operations["startSession"];
-        delete?: never;
+        put: operations["endActiveSession"];
+        post?: never;
+        delete: operations["deleteActiveSession"];
         options?: never;
         head?: never;
         patch?: never;
@@ -75,7 +75,7 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        get: operations["getSessionTemplates"];
         put?: never;
         post: operations["createSessionTemplate"];
         delete?: never;
@@ -140,6 +140,70 @@ export interface paths {
             cookie?: never;
         };
         get: operations["getExerciseTypes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getHomePage"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/user/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getUserSessions"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/templates/{id}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["startSessionTemplate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/sessions/active": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getActiveSession"];
         put?: never;
         post?: never;
         delete?: never;
@@ -216,6 +280,8 @@ export interface components {
             sets?: components["schemas"]["SetRequestDTO"][];
         };
         SessionRequestDTO: {
+            /** Format: int64 */
+            id?: number;
             name?: string;
             description?: string;
             exercises?: components["schemas"]["ExerciseRequestDTO"][];
@@ -225,6 +291,7 @@ export interface components {
             type?: SetRequestDTOType;
             /** Format: int32 */
             reps?: number;
+            /** Format: double */
             weight?: number;
         };
         ExerciseResponseDTO: {
@@ -238,6 +305,9 @@ export interface components {
         SessionResponseDTO: {
             /** Format: int64 */
             id?: number;
+            user?: components["schemas"]["UserResponseDTO"];
+            /** Format: double */
+            volume?: number;
             name?: string;
             description?: string;
             exercises?: components["schemas"]["ExerciseResponseDTO"][];
@@ -253,17 +323,65 @@ export interface components {
             type?: SetResponseDTOType;
             /** Format: int32 */
             reps?: number;
+            /** Format: double */
             weight?: number;
         };
-        SessionTemplateRequestDTO: {
-            name?: string;
-            exercises?: components["schemas"]["ExerciseRequestDTO"][];
+        TemplateExerciseRequestDTO: {
+            /** Format: int64 */
+            id?: number;
+            /** @enum {string} */
+            type?: TemplateExerciseRequestDTOType;
+            sets?: components["schemas"]["TemplateSetRequestDTO"][];
         };
-        SessionTemplateResponseDTO: {
+        TemplateSessionRequestDTO: {
+            name?: string;
+            exercises?: components["schemas"]["TemplateExerciseRequestDTO"][];
+        };
+        TemplateSetRequestDTO: {
+            /** Format: int64 */
+            id?: number;
+            /** @enum {string} */
+            type?: TemplateSetRequestDTOType;
+            /** Format: int32 */
+            reps?: number;
+            /** Format: double */
+            weight?: number;
+        };
+        TemplateExerciseResponseDTO: {
+            /** Format: int64 */
+            id?: number;
+            /** @enum {string} */
+            type?: TemplateExerciseResponseDTOType;
+            sets?: components["schemas"]["SetResponseDTO"][];
+        };
+        TemplateSessionResponseDTO: {
             /** Format: int64 */
             id?: number;
             name?: string;
-            exercises?: components["schemas"]["ExerciseResponseDTO"][];
+            exercises?: components["schemas"]["TemplateExerciseResponseDTO"][];
+        };
+        ActiveExerciseRequestDTO: {
+            /** Format: int64 */
+            id?: number;
+            /** @enum {string} */
+            type?: ActiveExerciseRequestDTOType;
+            sets?: components["schemas"]["ActiveSetRequestDTO"][];
+        };
+        ActiveSessionRequestDTO: {
+            name?: string;
+            exercises?: components["schemas"]["ActiveExerciseRequestDTO"][];
+            /** Format: date-time */
+            start?: string;
+        };
+        ActiveSetRequestDTO: {
+            /** Format: int64 */
+            id?: number;
+            /** @enum {string} */
+            type?: ActiveSetRequestDTOType;
+            /** Format: int32 */
+            reps?: number;
+            /** Format: double */
+            weight?: number;
         };
         SetTypeDTO: {
             /** Format: int64 */
@@ -276,6 +394,28 @@ export interface components {
             id?: number;
             /** @enum {string} */
             type?: ExerciseTypeDTOType;
+        };
+        SessionOverviewResponseDTO: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            exercises?: SessionOverviewResponseDTOExercises[];
+        };
+        ActiveExerciseResponseDTO: {
+            /** Format: int64 */
+            id?: number;
+            /** @enum {string} */
+            type?: ActiveExerciseResponseDTOType;
+            sets?: components["schemas"]["SetResponseDTO"][];
+        };
+        ActiveSessionResponseDTO: {
+            /** Format: int64 */
+            id?: number;
+            name?: string;
+            description?: string;
+            exercises?: components["schemas"]["ActiveExerciseResponseDTO"][];
+            /** Format: date-time */
+            start?: string;
         };
     };
     responses: never;
@@ -404,28 +544,6 @@ export interface operations {
             };
         };
     };
-    endSession: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: number;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description OK */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "*/*": components["schemas"]["SessionResponseDTO"];
-                };
-            };
-        };
-    };
     deleteSession: {
         parameters: {
             query?: never;
@@ -465,7 +583,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["SessionTemplateResponseDTO"];
+                    "*/*": components["schemas"]["TemplateSessionResponseDTO"];
                 };
             };
         };
@@ -481,7 +599,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SessionTemplateRequestDTO"];
+                "application/json": components["schemas"]["TemplateSessionRequestDTO"];
             };
         };
         responses: {
@@ -491,7 +609,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["SessionTemplateResponseDTO"];
+                    "*/*": components["schemas"]["TemplateSessionResponseDTO"];
                 };
             };
         };
@@ -518,16 +636,18 @@ export interface operations {
             };
         };
     };
-    startSession: {
+    endActiveSession: {
         parameters: {
             query?: never;
             header?: never;
-            path?: never;
+            path: {
+                id: number;
+            };
             cookie?: never;
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SessionRequestDTO"];
+                "application/json": components["schemas"]["ActiveSessionRequestDTO"];
             };
         };
         responses: {
@@ -542,6 +662,50 @@ export interface operations {
             };
         };
     };
+    deleteActiveSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": Record<string, never>;
+                };
+            };
+        };
+    };
+    getSessionTemplates: {
+        parameters: {
+            query: {
+                offset: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SessionOverviewResponseDTO"][];
+                };
+            };
+        };
+    };
     createSessionTemplate: {
         parameters: {
             query?: never;
@@ -551,7 +715,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SessionTemplateRequestDTO"];
+                "application/json": components["schemas"]["TemplateSessionRequestDTO"];
             };
         };
         responses: {
@@ -561,7 +725,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["SessionTemplateResponseDTO"];
+                    "*/*": components["schemas"]["TemplateSessionResponseDTO"];
                 };
             };
         };
@@ -650,6 +814,94 @@ export interface operations {
                 };
                 content: {
                     "*/*": components["schemas"]["ExerciseTypeDTO"][];
+                };
+            };
+        };
+    };
+    getHomePage: {
+        parameters: {
+            query: {
+                offset: number;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SessionResponseDTO"][];
+                };
+            };
+        };
+    };
+    getUserSessions: {
+        parameters: {
+            query: {
+                offset: number;
+            };
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["SessionResponseDTO"][];
+                };
+            };
+        };
+    };
+    startSessionTemplate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ActiveSessionResponseDTO"];
+                };
+            };
+        };
+    };
+    getActiveSession: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["ActiveSessionResponseDTO"];
                 };
             };
         };
@@ -873,6 +1125,227 @@ export enum SetResponseDTOType {
     DROP_SET = "DROP_SET",
     SUPER_SET = "SUPER_SET"
 }
+export enum TemplateExerciseRequestDTOType {
+    BARBELL_BENCH_PRESS = "BARBELL_BENCH_PRESS",
+    DUMBBELL_BENCH_PRESS = "DUMBBELL_BENCH_PRESS",
+    INCLINE_BENCH_PRESS = "INCLINE_BENCH_PRESS",
+    DECLINE_BENCH_PRESS = "DECLINE_BENCH_PRESS",
+    CHEST_FLY_DUMBBELL = "CHEST_FLY_DUMBBELL",
+    PEC_DECK_MACHINE = "PEC_DECK_MACHINE",
+    CHEST_PRESS_MACHINE = "CHEST_PRESS_MACHINE",
+    CABLE_CROSSOVER = "CABLE_CROSSOVER",
+    PUSH_UP = "PUSH_UP",
+    DIPS = "DIPS",
+    PULL_UP = "PULL_UP",
+    CHIN_UP = "CHIN_UP",
+    LAT_PULLDOWN = "LAT_PULLDOWN",
+    BARBELL_ROW = "BARBELL_ROW",
+    DUMBBELL_ROW = "DUMBBELL_ROW",
+    SEATED_CABLE_ROW = "SEATED_CABLE_ROW",
+    T_BAR_ROW = "T_BAR_ROW",
+    MACHINE_ROW = "MACHINE_ROW",
+    DEADLIFT = "DEADLIFT",
+    HYPEREXTENSION = "HYPEREXTENSION",
+    OVERHEAD_PRESS_BARBELL = "OVERHEAD_PRESS_BARBELL",
+    OVERHEAD_PRESS_DUMBBELL = "OVERHEAD_PRESS_DUMBBELL",
+    SHOULDER_PRESS_MACHINE = "SHOULDER_PRESS_MACHINE",
+    ARNOLD_PRESS = "ARNOLD_PRESS",
+    LATERAL_RAISE_DUMBBELL = "LATERAL_RAISE_DUMBBELL",
+    LATERAL_RAISE_MACHINE = "LATERAL_RAISE_MACHINE",
+    FRONT_RAISE = "FRONT_RAISE",
+    REAR_DELT_FLY = "REAR_DELT_FLY",
+    FACE_PULL = "FACE_PULL",
+    UPRIGHT_ROW = "UPRIGHT_ROW",
+    BARBELL_BICEPS_CURL = "BARBELL_BICEPS_CURL",
+    DUMBBELL_BICEPS_CURL = "DUMBBELL_BICEPS_CURL",
+    HAMMER_CURL = "HAMMER_CURL",
+    PREACHER_CURL_MACHINE = "PREACHER_CURL_MACHINE",
+    CABLE_BICEPS_CURL = "CABLE_BICEPS_CURL",
+    TRICEPS_PUSH_DOWN = "TRICEPS_PUSH_DOWN",
+    SKULL_CRUSHER = "SKULL_CRUSHER",
+    OVERHEAD_TRICEPS_EXTENSION = "OVERHEAD_TRICEPS_EXTENSION",
+    TRICEPS_DIP = "TRICEPS_DIP",
+    TRICEPS_EXTENSION_MACHINE = "TRICEPS_EXTENSION_MACHINE",
+    BARBELL_SQUAT = "BARBELL_SQUAT",
+    FRONT_SQUAT = "FRONT_SQUAT",
+    LEG_PRESS_MACHINE = "LEG_PRESS_MACHINE",
+    HACK_SQUAT_MACHINE = "HACK_SQUAT_MACHINE",
+    LUNGES = "LUNGES",
+    LEG_EXTENSION = "LEG_EXTENSION",
+    LEG_CURL = "LEG_CURL",
+    ROMANIAN_DEADLIFT = "ROMANIAN_DEADLIFT",
+    CALF_RAISE_STANDING = "CALF_RAISE_STANDING",
+    CALF_RAISE_SEATED = "CALF_RAISE_SEATED",
+    HIP_THRUST = "HIP_THRUST",
+    GLUTE_BRIDGE = "GLUTE_BRIDGE",
+    PLANK = "PLANK",
+    SIDE_PLANK = "SIDE_PLANK",
+    CRUNCH = "CRUNCH",
+    CABLE_CRUNCH = "CABLE_CRUNCH",
+    LEG_RAISE = "LEG_RAISE",
+    HANGING_LEG_RAISE = "HANGING_LEG_RAISE",
+    RUSSIAN_TWIST = "RUSSIAN_TWIST",
+    AB_WHEEL_ROLLOUT = "AB_WHEEL_ROLLOUT",
+    BACK_EXTENSION_MACHINE = "BACK_EXTENSION_MACHINE",
+    TREADMILL = "TREADMILL",
+    STATIONARY_BIKE = "STATIONARY_BIKE",
+    SPIN_BIKE = "SPIN_BIKE",
+    ELLIPTICAL = "ELLIPTICAL",
+    STAIR_CLIMBER = "STAIR_CLIMBER",
+    ROWING_MACHINE = "ROWING_MACHINE"
+}
+export enum TemplateSetRequestDTOType {
+    NORMAL = "NORMAL",
+    WARM_UP = "WARM_UP",
+    FAILURE = "FAILURE",
+    DROP_SET = "DROP_SET",
+    SUPER_SET = "SUPER_SET"
+}
+export enum TemplateExerciseResponseDTOType {
+    BARBELL_BENCH_PRESS = "BARBELL_BENCH_PRESS",
+    DUMBBELL_BENCH_PRESS = "DUMBBELL_BENCH_PRESS",
+    INCLINE_BENCH_PRESS = "INCLINE_BENCH_PRESS",
+    DECLINE_BENCH_PRESS = "DECLINE_BENCH_PRESS",
+    CHEST_FLY_DUMBBELL = "CHEST_FLY_DUMBBELL",
+    PEC_DECK_MACHINE = "PEC_DECK_MACHINE",
+    CHEST_PRESS_MACHINE = "CHEST_PRESS_MACHINE",
+    CABLE_CROSSOVER = "CABLE_CROSSOVER",
+    PUSH_UP = "PUSH_UP",
+    DIPS = "DIPS",
+    PULL_UP = "PULL_UP",
+    CHIN_UP = "CHIN_UP",
+    LAT_PULLDOWN = "LAT_PULLDOWN",
+    BARBELL_ROW = "BARBELL_ROW",
+    DUMBBELL_ROW = "DUMBBELL_ROW",
+    SEATED_CABLE_ROW = "SEATED_CABLE_ROW",
+    T_BAR_ROW = "T_BAR_ROW",
+    MACHINE_ROW = "MACHINE_ROW",
+    DEADLIFT = "DEADLIFT",
+    HYPEREXTENSION = "HYPEREXTENSION",
+    OVERHEAD_PRESS_BARBELL = "OVERHEAD_PRESS_BARBELL",
+    OVERHEAD_PRESS_DUMBBELL = "OVERHEAD_PRESS_DUMBBELL",
+    SHOULDER_PRESS_MACHINE = "SHOULDER_PRESS_MACHINE",
+    ARNOLD_PRESS = "ARNOLD_PRESS",
+    LATERAL_RAISE_DUMBBELL = "LATERAL_RAISE_DUMBBELL",
+    LATERAL_RAISE_MACHINE = "LATERAL_RAISE_MACHINE",
+    FRONT_RAISE = "FRONT_RAISE",
+    REAR_DELT_FLY = "REAR_DELT_FLY",
+    FACE_PULL = "FACE_PULL",
+    UPRIGHT_ROW = "UPRIGHT_ROW",
+    BARBELL_BICEPS_CURL = "BARBELL_BICEPS_CURL",
+    DUMBBELL_BICEPS_CURL = "DUMBBELL_BICEPS_CURL",
+    HAMMER_CURL = "HAMMER_CURL",
+    PREACHER_CURL_MACHINE = "PREACHER_CURL_MACHINE",
+    CABLE_BICEPS_CURL = "CABLE_BICEPS_CURL",
+    TRICEPS_PUSH_DOWN = "TRICEPS_PUSH_DOWN",
+    SKULL_CRUSHER = "SKULL_CRUSHER",
+    OVERHEAD_TRICEPS_EXTENSION = "OVERHEAD_TRICEPS_EXTENSION",
+    TRICEPS_DIP = "TRICEPS_DIP",
+    TRICEPS_EXTENSION_MACHINE = "TRICEPS_EXTENSION_MACHINE",
+    BARBELL_SQUAT = "BARBELL_SQUAT",
+    FRONT_SQUAT = "FRONT_SQUAT",
+    LEG_PRESS_MACHINE = "LEG_PRESS_MACHINE",
+    HACK_SQUAT_MACHINE = "HACK_SQUAT_MACHINE",
+    LUNGES = "LUNGES",
+    LEG_EXTENSION = "LEG_EXTENSION",
+    LEG_CURL = "LEG_CURL",
+    ROMANIAN_DEADLIFT = "ROMANIAN_DEADLIFT",
+    CALF_RAISE_STANDING = "CALF_RAISE_STANDING",
+    CALF_RAISE_SEATED = "CALF_RAISE_SEATED",
+    HIP_THRUST = "HIP_THRUST",
+    GLUTE_BRIDGE = "GLUTE_BRIDGE",
+    PLANK = "PLANK",
+    SIDE_PLANK = "SIDE_PLANK",
+    CRUNCH = "CRUNCH",
+    CABLE_CRUNCH = "CABLE_CRUNCH",
+    LEG_RAISE = "LEG_RAISE",
+    HANGING_LEG_RAISE = "HANGING_LEG_RAISE",
+    RUSSIAN_TWIST = "RUSSIAN_TWIST",
+    AB_WHEEL_ROLLOUT = "AB_WHEEL_ROLLOUT",
+    BACK_EXTENSION_MACHINE = "BACK_EXTENSION_MACHINE",
+    TREADMILL = "TREADMILL",
+    STATIONARY_BIKE = "STATIONARY_BIKE",
+    SPIN_BIKE = "SPIN_BIKE",
+    ELLIPTICAL = "ELLIPTICAL",
+    STAIR_CLIMBER = "STAIR_CLIMBER",
+    ROWING_MACHINE = "ROWING_MACHINE"
+}
+export enum ActiveExerciseRequestDTOType {
+    BARBELL_BENCH_PRESS = "BARBELL_BENCH_PRESS",
+    DUMBBELL_BENCH_PRESS = "DUMBBELL_BENCH_PRESS",
+    INCLINE_BENCH_PRESS = "INCLINE_BENCH_PRESS",
+    DECLINE_BENCH_PRESS = "DECLINE_BENCH_PRESS",
+    CHEST_FLY_DUMBBELL = "CHEST_FLY_DUMBBELL",
+    PEC_DECK_MACHINE = "PEC_DECK_MACHINE",
+    CHEST_PRESS_MACHINE = "CHEST_PRESS_MACHINE",
+    CABLE_CROSSOVER = "CABLE_CROSSOVER",
+    PUSH_UP = "PUSH_UP",
+    DIPS = "DIPS",
+    PULL_UP = "PULL_UP",
+    CHIN_UP = "CHIN_UP",
+    LAT_PULLDOWN = "LAT_PULLDOWN",
+    BARBELL_ROW = "BARBELL_ROW",
+    DUMBBELL_ROW = "DUMBBELL_ROW",
+    SEATED_CABLE_ROW = "SEATED_CABLE_ROW",
+    T_BAR_ROW = "T_BAR_ROW",
+    MACHINE_ROW = "MACHINE_ROW",
+    DEADLIFT = "DEADLIFT",
+    HYPEREXTENSION = "HYPEREXTENSION",
+    OVERHEAD_PRESS_BARBELL = "OVERHEAD_PRESS_BARBELL",
+    OVERHEAD_PRESS_DUMBBELL = "OVERHEAD_PRESS_DUMBBELL",
+    SHOULDER_PRESS_MACHINE = "SHOULDER_PRESS_MACHINE",
+    ARNOLD_PRESS = "ARNOLD_PRESS",
+    LATERAL_RAISE_DUMBBELL = "LATERAL_RAISE_DUMBBELL",
+    LATERAL_RAISE_MACHINE = "LATERAL_RAISE_MACHINE",
+    FRONT_RAISE = "FRONT_RAISE",
+    REAR_DELT_FLY = "REAR_DELT_FLY",
+    FACE_PULL = "FACE_PULL",
+    UPRIGHT_ROW = "UPRIGHT_ROW",
+    BARBELL_BICEPS_CURL = "BARBELL_BICEPS_CURL",
+    DUMBBELL_BICEPS_CURL = "DUMBBELL_BICEPS_CURL",
+    HAMMER_CURL = "HAMMER_CURL",
+    PREACHER_CURL_MACHINE = "PREACHER_CURL_MACHINE",
+    CABLE_BICEPS_CURL = "CABLE_BICEPS_CURL",
+    TRICEPS_PUSH_DOWN = "TRICEPS_PUSH_DOWN",
+    SKULL_CRUSHER = "SKULL_CRUSHER",
+    OVERHEAD_TRICEPS_EXTENSION = "OVERHEAD_TRICEPS_EXTENSION",
+    TRICEPS_DIP = "TRICEPS_DIP",
+    TRICEPS_EXTENSION_MACHINE = "TRICEPS_EXTENSION_MACHINE",
+    BARBELL_SQUAT = "BARBELL_SQUAT",
+    FRONT_SQUAT = "FRONT_SQUAT",
+    LEG_PRESS_MACHINE = "LEG_PRESS_MACHINE",
+    HACK_SQUAT_MACHINE = "HACK_SQUAT_MACHINE",
+    LUNGES = "LUNGES",
+    LEG_EXTENSION = "LEG_EXTENSION",
+    LEG_CURL = "LEG_CURL",
+    ROMANIAN_DEADLIFT = "ROMANIAN_DEADLIFT",
+    CALF_RAISE_STANDING = "CALF_RAISE_STANDING",
+    CALF_RAISE_SEATED = "CALF_RAISE_SEATED",
+    HIP_THRUST = "HIP_THRUST",
+    GLUTE_BRIDGE = "GLUTE_BRIDGE",
+    PLANK = "PLANK",
+    SIDE_PLANK = "SIDE_PLANK",
+    CRUNCH = "CRUNCH",
+    CABLE_CRUNCH = "CABLE_CRUNCH",
+    LEG_RAISE = "LEG_RAISE",
+    HANGING_LEG_RAISE = "HANGING_LEG_RAISE",
+    RUSSIAN_TWIST = "RUSSIAN_TWIST",
+    AB_WHEEL_ROLLOUT = "AB_WHEEL_ROLLOUT",
+    BACK_EXTENSION_MACHINE = "BACK_EXTENSION_MACHINE",
+    TREADMILL = "TREADMILL",
+    STATIONARY_BIKE = "STATIONARY_BIKE",
+    SPIN_BIKE = "SPIN_BIKE",
+    ELLIPTICAL = "ELLIPTICAL",
+    STAIR_CLIMBER = "STAIR_CLIMBER",
+    ROWING_MACHINE = "ROWING_MACHINE"
+}
+export enum ActiveSetRequestDTOType {
+    NORMAL = "NORMAL",
+    WARM_UP = "WARM_UP",
+    FAILURE = "FAILURE",
+    DROP_SET = "DROP_SET",
+    SUPER_SET = "SUPER_SET"
+}
 export enum SetTypeDTOType {
     NORMAL = "NORMAL",
     WARM_UP = "WARM_UP",
@@ -881,6 +1354,144 @@ export enum SetTypeDTOType {
     SUPER_SET = "SUPER_SET"
 }
 export enum ExerciseTypeDTOType {
+    BARBELL_BENCH_PRESS = "BARBELL_BENCH_PRESS",
+    DUMBBELL_BENCH_PRESS = "DUMBBELL_BENCH_PRESS",
+    INCLINE_BENCH_PRESS = "INCLINE_BENCH_PRESS",
+    DECLINE_BENCH_PRESS = "DECLINE_BENCH_PRESS",
+    CHEST_FLY_DUMBBELL = "CHEST_FLY_DUMBBELL",
+    PEC_DECK_MACHINE = "PEC_DECK_MACHINE",
+    CHEST_PRESS_MACHINE = "CHEST_PRESS_MACHINE",
+    CABLE_CROSSOVER = "CABLE_CROSSOVER",
+    PUSH_UP = "PUSH_UP",
+    DIPS = "DIPS",
+    PULL_UP = "PULL_UP",
+    CHIN_UP = "CHIN_UP",
+    LAT_PULLDOWN = "LAT_PULLDOWN",
+    BARBELL_ROW = "BARBELL_ROW",
+    DUMBBELL_ROW = "DUMBBELL_ROW",
+    SEATED_CABLE_ROW = "SEATED_CABLE_ROW",
+    T_BAR_ROW = "T_BAR_ROW",
+    MACHINE_ROW = "MACHINE_ROW",
+    DEADLIFT = "DEADLIFT",
+    HYPEREXTENSION = "HYPEREXTENSION",
+    OVERHEAD_PRESS_BARBELL = "OVERHEAD_PRESS_BARBELL",
+    OVERHEAD_PRESS_DUMBBELL = "OVERHEAD_PRESS_DUMBBELL",
+    SHOULDER_PRESS_MACHINE = "SHOULDER_PRESS_MACHINE",
+    ARNOLD_PRESS = "ARNOLD_PRESS",
+    LATERAL_RAISE_DUMBBELL = "LATERAL_RAISE_DUMBBELL",
+    LATERAL_RAISE_MACHINE = "LATERAL_RAISE_MACHINE",
+    FRONT_RAISE = "FRONT_RAISE",
+    REAR_DELT_FLY = "REAR_DELT_FLY",
+    FACE_PULL = "FACE_PULL",
+    UPRIGHT_ROW = "UPRIGHT_ROW",
+    BARBELL_BICEPS_CURL = "BARBELL_BICEPS_CURL",
+    DUMBBELL_BICEPS_CURL = "DUMBBELL_BICEPS_CURL",
+    HAMMER_CURL = "HAMMER_CURL",
+    PREACHER_CURL_MACHINE = "PREACHER_CURL_MACHINE",
+    CABLE_BICEPS_CURL = "CABLE_BICEPS_CURL",
+    TRICEPS_PUSH_DOWN = "TRICEPS_PUSH_DOWN",
+    SKULL_CRUSHER = "SKULL_CRUSHER",
+    OVERHEAD_TRICEPS_EXTENSION = "OVERHEAD_TRICEPS_EXTENSION",
+    TRICEPS_DIP = "TRICEPS_DIP",
+    TRICEPS_EXTENSION_MACHINE = "TRICEPS_EXTENSION_MACHINE",
+    BARBELL_SQUAT = "BARBELL_SQUAT",
+    FRONT_SQUAT = "FRONT_SQUAT",
+    LEG_PRESS_MACHINE = "LEG_PRESS_MACHINE",
+    HACK_SQUAT_MACHINE = "HACK_SQUAT_MACHINE",
+    LUNGES = "LUNGES",
+    LEG_EXTENSION = "LEG_EXTENSION",
+    LEG_CURL = "LEG_CURL",
+    ROMANIAN_DEADLIFT = "ROMANIAN_DEADLIFT",
+    CALF_RAISE_STANDING = "CALF_RAISE_STANDING",
+    CALF_RAISE_SEATED = "CALF_RAISE_SEATED",
+    HIP_THRUST = "HIP_THRUST",
+    GLUTE_BRIDGE = "GLUTE_BRIDGE",
+    PLANK = "PLANK",
+    SIDE_PLANK = "SIDE_PLANK",
+    CRUNCH = "CRUNCH",
+    CABLE_CRUNCH = "CABLE_CRUNCH",
+    LEG_RAISE = "LEG_RAISE",
+    HANGING_LEG_RAISE = "HANGING_LEG_RAISE",
+    RUSSIAN_TWIST = "RUSSIAN_TWIST",
+    AB_WHEEL_ROLLOUT = "AB_WHEEL_ROLLOUT",
+    BACK_EXTENSION_MACHINE = "BACK_EXTENSION_MACHINE",
+    TREADMILL = "TREADMILL",
+    STATIONARY_BIKE = "STATIONARY_BIKE",
+    SPIN_BIKE = "SPIN_BIKE",
+    ELLIPTICAL = "ELLIPTICAL",
+    STAIR_CLIMBER = "STAIR_CLIMBER",
+    ROWING_MACHINE = "ROWING_MACHINE"
+}
+export enum SessionOverviewResponseDTOExercises {
+    BARBELL_BENCH_PRESS = "BARBELL_BENCH_PRESS",
+    DUMBBELL_BENCH_PRESS = "DUMBBELL_BENCH_PRESS",
+    INCLINE_BENCH_PRESS = "INCLINE_BENCH_PRESS",
+    DECLINE_BENCH_PRESS = "DECLINE_BENCH_PRESS",
+    CHEST_FLY_DUMBBELL = "CHEST_FLY_DUMBBELL",
+    PEC_DECK_MACHINE = "PEC_DECK_MACHINE",
+    CHEST_PRESS_MACHINE = "CHEST_PRESS_MACHINE",
+    CABLE_CROSSOVER = "CABLE_CROSSOVER",
+    PUSH_UP = "PUSH_UP",
+    DIPS = "DIPS",
+    PULL_UP = "PULL_UP",
+    CHIN_UP = "CHIN_UP",
+    LAT_PULLDOWN = "LAT_PULLDOWN",
+    BARBELL_ROW = "BARBELL_ROW",
+    DUMBBELL_ROW = "DUMBBELL_ROW",
+    SEATED_CABLE_ROW = "SEATED_CABLE_ROW",
+    T_BAR_ROW = "T_BAR_ROW",
+    MACHINE_ROW = "MACHINE_ROW",
+    DEADLIFT = "DEADLIFT",
+    HYPEREXTENSION = "HYPEREXTENSION",
+    OVERHEAD_PRESS_BARBELL = "OVERHEAD_PRESS_BARBELL",
+    OVERHEAD_PRESS_DUMBBELL = "OVERHEAD_PRESS_DUMBBELL",
+    SHOULDER_PRESS_MACHINE = "SHOULDER_PRESS_MACHINE",
+    ARNOLD_PRESS = "ARNOLD_PRESS",
+    LATERAL_RAISE_DUMBBELL = "LATERAL_RAISE_DUMBBELL",
+    LATERAL_RAISE_MACHINE = "LATERAL_RAISE_MACHINE",
+    FRONT_RAISE = "FRONT_RAISE",
+    REAR_DELT_FLY = "REAR_DELT_FLY",
+    FACE_PULL = "FACE_PULL",
+    UPRIGHT_ROW = "UPRIGHT_ROW",
+    BARBELL_BICEPS_CURL = "BARBELL_BICEPS_CURL",
+    DUMBBELL_BICEPS_CURL = "DUMBBELL_BICEPS_CURL",
+    HAMMER_CURL = "HAMMER_CURL",
+    PREACHER_CURL_MACHINE = "PREACHER_CURL_MACHINE",
+    CABLE_BICEPS_CURL = "CABLE_BICEPS_CURL",
+    TRICEPS_PUSH_DOWN = "TRICEPS_PUSH_DOWN",
+    SKULL_CRUSHER = "SKULL_CRUSHER",
+    OVERHEAD_TRICEPS_EXTENSION = "OVERHEAD_TRICEPS_EXTENSION",
+    TRICEPS_DIP = "TRICEPS_DIP",
+    TRICEPS_EXTENSION_MACHINE = "TRICEPS_EXTENSION_MACHINE",
+    BARBELL_SQUAT = "BARBELL_SQUAT",
+    FRONT_SQUAT = "FRONT_SQUAT",
+    LEG_PRESS_MACHINE = "LEG_PRESS_MACHINE",
+    HACK_SQUAT_MACHINE = "HACK_SQUAT_MACHINE",
+    LUNGES = "LUNGES",
+    LEG_EXTENSION = "LEG_EXTENSION",
+    LEG_CURL = "LEG_CURL",
+    ROMANIAN_DEADLIFT = "ROMANIAN_DEADLIFT",
+    CALF_RAISE_STANDING = "CALF_RAISE_STANDING",
+    CALF_RAISE_SEATED = "CALF_RAISE_SEATED",
+    HIP_THRUST = "HIP_THRUST",
+    GLUTE_BRIDGE = "GLUTE_BRIDGE",
+    PLANK = "PLANK",
+    SIDE_PLANK = "SIDE_PLANK",
+    CRUNCH = "CRUNCH",
+    CABLE_CRUNCH = "CABLE_CRUNCH",
+    LEG_RAISE = "LEG_RAISE",
+    HANGING_LEG_RAISE = "HANGING_LEG_RAISE",
+    RUSSIAN_TWIST = "RUSSIAN_TWIST",
+    AB_WHEEL_ROLLOUT = "AB_WHEEL_ROLLOUT",
+    BACK_EXTENSION_MACHINE = "BACK_EXTENSION_MACHINE",
+    TREADMILL = "TREADMILL",
+    STATIONARY_BIKE = "STATIONARY_BIKE",
+    SPIN_BIKE = "SPIN_BIKE",
+    ELLIPTICAL = "ELLIPTICAL",
+    STAIR_CLIMBER = "STAIR_CLIMBER",
+    ROWING_MACHINE = "ROWING_MACHINE"
+}
+export enum ActiveExerciseResponseDTOType {
     BARBELL_BENCH_PRESS = "BARBELL_BENCH_PRESS",
     DUMBBELL_BENCH_PRESS = "DUMBBELL_BENCH_PRESS",
     INCLINE_BENCH_PRESS = "INCLINE_BENCH_PRESS",

@@ -1,24 +1,14 @@
 import type { ApiState, Id } from "../types/Common"
-import { TailSpin } from "react-loader-spinner"
+import Spinner from "./Spinner"
 
 
-interface LoaderProps <T extends Id> {
-    state: ApiState<T>
+interface LoaderProps <T> {
+    state: ApiState<T | string>
+    children: (data: T) => React.ReactNode
 }
-export function Loader <T extends Id> ({ state }: LoaderProps <T>) {
-    const spinner = 
-        <div className="flex w-full h-full justify-center items-center">
-            <TailSpin
-                height="40"
-                width="40"
-                color="#4fa94d"
-                ariaLabel="loading"
-            />
-        </div>
+export function Loader <T extends Id> ({ state, children }: LoaderProps <T>) {
 
-    if (state.loading) return (
-        spinner
-    )
+    if (state.loading) return <Spinner/>
 
     const result = state.result;
     if (!result) return null;
@@ -28,4 +18,12 @@ export function Loader <T extends Id> ({ state }: LoaderProps <T>) {
             {result.error}
         </div>
     )
+
+    if (typeof result.data === "string") return (
+        <div className="flex w-full h-full justify-center items-center">
+            {result.data}
+        </div>
+    )
+
+    return children(result.data as T)
 }
