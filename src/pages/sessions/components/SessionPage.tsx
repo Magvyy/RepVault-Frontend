@@ -1,5 +1,5 @@
 import { SessionTable } from "@/features/session";
-import { useApiCall } from "@/shared/hooks/handleApiCall";
+import { useApiCall } from "@/shared/hooks/useApiCall";
 import { convert_to_UI } from "@/shared/types/Common";
 import { type SessionResponse, type UISession  } from "@/shared/types/SessionAPI";
 import { useEffect, useState } from "react";
@@ -20,7 +20,7 @@ export default function SessionPage() {
             credentials: true,
             method: "GET"
         })
-    }, [])
+    }, [id])
 
     useEffect(() => {
         if (state.loading || !state.result) return

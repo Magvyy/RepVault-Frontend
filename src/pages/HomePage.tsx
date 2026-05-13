@@ -1,21 +1,33 @@
+import { useAuth } from "@/app/ContextProvider"
 import { UserCard, UserName, UserPicture } from "@/features/user"
 import InfiniteScroller from "@/shared/components/InfiniteScroller"
 import Spinner from "@/shared/components/Spinner"
-import { useInfiniteScrollApiCall } from "@/shared/hooks/infiniteScrollApiCall"
+import { useInfiniteScrollApiCall } from "@/shared/hooks/useInfiniteScrollApiCall"
 import { convertTimeDifferenceToLocalString, convertToLocalString } from "@/shared/services/convertToLocalString"
 import formatEnumToString from "@/shared/services/formatEnumToString"
 import type { SessionResponse, UISessionResponse } from "@/shared/types/SessionAPI"
 import type { UserResponse } from "@/shared/types/UserAPI"
-import { useRef } from "react"
+import { useEffect, useRef } from "react"
+import { useLocation, useNavigate } from "react-router-dom"
 
 
 
 
 
 export default function HomePage() {
-    const scrollRef = useRef<HTMLDivElement>(null)
+    const location = useLocation()
+    const { auth, setAuth } = useAuth()
 
-    const { data: sessions, state } = useInfiniteScrollApiCall<SessionResponse, UISessionResponse>({
+    useEffect(() => {
+        if (location.state?.clearAuth) {
+            setAuth(undefined)
+        }
+    }, [location.state])
+
+    const navigate = useNavigate()
+
+    const scrollRef = useRef<HTMLDivElement>(null)
+    const { data: sessions, state, reset } = useInfiniteScrollApiCall<SessionResponse, UISessionResponse>({
         contentRef: scrollRef,
         apiProps: {
             endpoint: `/sessions`,
@@ -24,17 +36,21 @@ export default function HomePage() {
         }
     })
 
+    useEffect(() => {
+        reset()
+    }, [auth])
+
     return (
         <InfiniteScroller>
             <div ref={scrollRef} className="w-full p-8 flex flex-col gap-5 justify-start items-center">
                 {sessions.map(s => 
-                    <div key={s.clientId} onClick={e => window.location.href = `/sessions/${s.id}`} className="flex flex-col items-center bg-card p-2 rounded-[10px] gap-[2px] w-1/5 min-w-[350px]">
+                    <div key={s.clientId} onClick={e => navigate(`/sessions/${s.id}`)} className="flex flex-col items-center bg-card p-2 rounded-[10px] gap-[2px] w-1/5 min-w-[350px]">
                         <div className="w-full flex flex-col p-2 gap-[10px]">
                             <div className="flex justify-between">
                                 <div className="flex flex-col justify-between">
                                     <UserCard onClick={e => {
                                         e.stopPropagation()
-                                        window.location.href = `/users/${s.user?.id}`
+                                        navigate(`/users/${s.user?.id}`)
                                     }} className="flex gap-[10px] py-2 cursor-pointer">
                                         <UserPicture className="w-[30px] rounded-[50%]"/>
                                         <UserName className="flex items-center" name={(s.user as UserResponse).user_name} />
@@ -71,7 +87,7 @@ export default function HomePage() {
                             {(s.exercises.length > 3) &&
                                 <>
                                     <hr className="w-full h-[1px] bg-neutral-950"/>
-                                    <p className="self-center cursor-pointer text-xs" onClick={e => window.location.href = `/sessions/${s.id}`}>Click to view {s.exercises.length - 3} more exercises</p>
+                                    <p className="self-center cursor-pointer text-xs" onClick={e => navigate(`/sessions/${s.id}`)}>Click to view {s.exercises.length - 3} more exercises</p>
                                 </>
                             }
                         </div>

@@ -1,9 +1,9 @@
-import { ExerciseRequestDTOType } from "./ApiTypes";
+import { ExerciseResponseDTOType } from "./ApiTypes";
 import type { Id, UI } from "./Common";
 import type { UISet, SetRequest, SetResponse, UISetResponse } from "./SetAPI";
 
-export type ExerciseEnum = typeof ExerciseRequestDTOType[keyof typeof ExerciseRequestDTOType];
-export const ExerciseTypes = Object.values(ExerciseRequestDTOType);
+export type ExerciseEnum = typeof ExerciseResponseDTOType[keyof typeof ExerciseResponseDTOType];
+export const ExerciseTypes = Object.values(ExerciseResponseDTOType);
 
 export interface UIExercise extends UI {
     id?: number
@@ -36,6 +36,6 @@ export interface ExerciseResponse extends Id {
 
 export interface ExerciseRequest {
     type: ExerciseEnum
-    description: string
+    description?: string
     sets: SetRequest[]
 }

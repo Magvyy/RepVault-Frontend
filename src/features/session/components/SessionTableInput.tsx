@@ -3,6 +3,7 @@ import { ExerciseCardInput } from "@/features/exercise";
 import { ExerciseTypes, type UIExercise } from "@/shared/types/ExerciseAPI";
 import type { UISession } from "@/shared/types/SessionAPI";
 import type { SetEnum } from "@/shared/types/SetAPI";
+import clsx from "clsx";
 import { useCallback, useEffect } from "react";
 
 
@@ -10,8 +11,9 @@ import { useCallback, useEffect } from "react";
 interface SessionTableInputProps {
     session: UISession
     setSession: React.Dispatch<React.SetStateAction<UISession>>
+    className?: string
 }
-export function SessionTableInput({ session, setSession }: SessionTableInputProps) {
+export function SessionTableInput({ session, setSession, className }: SessionTableInputProps) {
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -52,7 +54,7 @@ export function SessionTableInput({ session, setSession }: SessionTableInputProp
     }, [setSession])
     
     return (
-        <div className="flex flex-col w-4/5 gap-[30px]">
+        <div className={clsx("base-class", className)}>
             <div className="flex flex-wrap justify-center w-full gap-[30px]">
                 {session.exercises.map(exercise => 
                     <ExerciseCardInput

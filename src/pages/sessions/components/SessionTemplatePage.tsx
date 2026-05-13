@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { SessionTableInput } from "@/features/session";
-import { useApiCall } from "@/shared/hooks/handleApiCall";
+import { useApiCall } from "@/shared/hooks/useApiCall";
 import { convert_to_UI, convet_to_API } from "@/shared/types/Common";
 import { type TemplateSessionResponse, type UISession } from "@/shared/types/SessionAPI";
 import { useEffect, useState } from "react";

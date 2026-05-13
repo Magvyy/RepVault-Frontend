@@ -23,7 +23,7 @@ export const useApiCall = <T> () => {
                 result: undefined
             })
             const sleep = (ms: number) => new Promise(resolve => setTimeout(resolve, ms))
-            await sleep(1000)
+            await sleep(200)
             const response = (credentials)
                 ? await fetch(import.meta.env.VITE_API_URL + endpoint, {
                     credentials: "include",
@@ -60,6 +60,15 @@ export const useApiCall = <T> () => {
                     result: {
                         data: "No content",
                         error: undefined
+                    }
+                })
+            } else if (response.status === 403) {
+                setState({
+                    called: true,
+                    loading: false,
+                    result: {
+                        data: undefined,
+                        error: "Unauthenticated"
                     }
                 })
             } else {

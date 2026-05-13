@@ -28,7 +28,7 @@ export const ExerciseCardInput = React.memo(function ExerciseCard({ exercise, up
     }, [updateExercise, exercise])
     
     return(
-        <Card className="flex flex-col justify-between w-fit gap-0 p-0">
+        <Card className="flex flex-col justify-between w-full min-w-[350px] gap-0 p-0">
             <div className="flex flex-col gap-0 p-0">
                 <ExerciseCardHeaderInput
                     clientId={exercise.clientId}

@@ -19,7 +19,7 @@ export const SetTableInput = React.memo( function SetTable({ sets, setSets }: Se
     }
 
     return (
-        <Table className="flex flex-col w-[400px] border-1 rounded-[10px]">
+        <Table className="flex flex-col w-full border-1 rounded-[10px]">
             <TableHeader className="sticky top-0 z-1">
                 <TableRow className={`w-full grid grid-cols-[3fr_2fr_2fr_1fr] gap-4`}>
                     <TableHead className="flex justify-center items-center px-4 py-0">Set</TableHead>

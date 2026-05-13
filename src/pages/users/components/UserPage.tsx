@@ -1,23 +1,27 @@
-import { UserCard, UserName, UserPicture } from "@/features/user";
-import InfiniteScroller from "@/shared/components/InfiniteScroller";
-import { Loader } from "@/shared/components/Loader";
-import Spinner from "@/shared/components/Spinner";
-import { useApiCall } from "@/shared/hooks/handleApiCall";
-import { useInfiniteScrollApiCall } from "@/shared/hooks/infiniteScrollApiCall";
-import { convertTimeDifferenceToLocalString, convertToLocalString } from "@/shared/services/convertToLocalString";
-import formatEnumToString from "@/shared/services/formatEnumToString";
-import { convert_to_UI } from "@/shared/types/Common";
-import { type SessionResponse, type UISession, type UISessionResponse } from "@/shared/types/SessionAPI";
-import { type UserResponse } from "@/shared/types/UserAPI";
-import { useEffect, useRef, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Button } from "@/components/ui/button"
+import { UserCard, UserName, UserPicture } from "@/features/user"
+import InfiniteScroller from "@/shared/components/InfiniteScroller"
+import { Loader } from "@/shared/components/Loader"
+import Spinner from "@/shared/components/Spinner"
+import { useApiCall } from "@/shared/hooks/useApiCall"
+import { useInfiniteScrollApiCall } from "@/shared/hooks/useInfiniteScrollApiCall"
+import { useId } from "@/shared/hooks/useId"
+import { convertTimeDifferenceToLocalString, convertToLocalString } from "@/shared/services/convertToLocalString"
+import formatEnumToString from "@/shared/services/formatEnumToString"
+import { type SessionResponse, type UISessionResponse } from "@/shared/types/SessionAPI"
+import { type UserResponse } from "@/shared/types/UserAPI"
+import { useEffect, useRef } from "react"
+import { useNavigate } from "react-router-dom"
+import { useFriendRequest } from "../hooks/useFriendRequest"
 
 
 
 export default function UserPage() {
     const { state: userState, handleApiCall: handleUserApiCall } = useApiCall<UserResponse>()
+    
+    const navigate = useNavigate()
 
-    const { id } = useParams()
+    const id = useId()
     
     const scrollRef = useRef<HTMLDivElement>(null)
 
@@ -30,14 +34,15 @@ export default function UserPage() {
         }
     })
 
-    
     useEffect(() => {
         handleUserApiCall({
             endpoint: `/users/${id}`,
             credentials: true,
             method: "GET"
         })
-    }, [])
+    }, [id])
+
+    const { sendFriendRequest, acceptFriendRequest, rejectFriendRequest } = useFriendRequest()
 
     return (
         <div className="w-full h-full p-10 flex flex-col items-center">
@@ -47,6 +52,27 @@ export default function UserPage() {
                         <>
                             <UserPicture className="w-[100px] rounded-[50%]"/>
                             <UserName className="flex items-center text-xl" name={data.user_name} />
+                            {
+                                data.can_accept ? 
+                                    <div className="flex gap-[10px]">
+                                        <Button onClick={e => {
+                                            acceptFriendRequest(id)
+                                            data.can_accept = false
+                                        }}>Accept Friend</Button>
+                                        <Button onClick={e => {
+                                            rejectFriendRequest(id)
+                                            data.can_accept = false
+                                            data.can_add = false
+                                        }}>Reject Friend</Button>
+                                    </div>
+                                : data.can_add && 
+                                    <div className="flex">
+                                        <Button onClick={e => {
+                                            sendFriendRequest(id)
+                                            data.can_add = false
+                                        }}>Add Friend</Button>
+                                    </div>
+                            }
                         </>
                     )}
                 </Loader>
@@ -54,7 +80,7 @@ export default function UserPage() {
             <InfiniteScroller>
                 <div ref={scrollRef} className="w-full p-8 flex flex-col gap-5 justify-start items-center">
                     {sessions.map(s => 
-                        <div key={s.clientId} onClick={e => window.location.href = `/sessions/${s.id}`} className="flex flex-col items-center bg-card p-2 rounded-[10px] gap-[2px] w-1/5 min-w-[350px]">
+                        <div key={s.clientId} onClick={e => navigate(`/sessions/${s.id}`)} className="flex flex-col items-center bg-card p-2 rounded-[10px] gap-[2px] w-1/5 min-w-[350px]">
                             <div className="w-full flex flex-col p-2 gap-[10px]">
                                 <div className="flex justify-between">
                                     <div className="flex flex-col justify-between">
@@ -94,7 +120,7 @@ export default function UserPage() {
                                 {(s.exercises.length > 3) &&
                                     <>
                                         <hr className="w-full h-[1px] bg-neutral-950"/>
-                                        <p className="self-center cursor-pointer text-xs" onClick={e => window.location.href = `/sessions/${s.id}`}>Click to view {s.exercises.length - 3} more exercises</p>
+                                        <p className="self-center cursor-pointer text-xs" onClick={e => navigate(`/sessions/${s.id}`)}>Click to view {s.exercises.length - 3} more exercises</p>
                                     </>
                                 }
                             </div>

@@ -1,7 +1,8 @@
-import { useEffect, useState, type RefObject } from "react";
-import { useApiCall } from "./handleApiCall";
+import { useCallback, useEffect, useState, type RefObject } from "react";
+import { useApiCall } from "./useApiCall";
 import { convert_to_UI, type Id, type UI } from "../types/Common";
-import { useInfiniteScroll } from "./infiniteScroll";
+import { useInfiniteScroll } from "./useInfiniteScroll";
+import { displayError } from "../services/displayError";
 
 interface InfiniteScrollApiCallProps {
     contentRef: RefObject<HTMLDivElement | null>
@@ -19,10 +20,17 @@ export const useInfiniteScrollApiCall = <T extends Id, K extends Id & UI> ({ con
     const [seen, setSeen] = useState<number[]>([])
     const [end, setEnd] = useState<boolean>(false)
 
+    const reset = useCallback(() => {
+        setData([])
+        setOffset(0)
+        setSeen([])
+        setEnd(false)
+    }, [])
+
     useEffect(() => {
         if ((!flags[0] && !flags[1]) || end) return
         handleApiCall({...apiProps, endpoint: apiProps.endpoint.includes("?") ? apiProps.endpoint + `&offset=${offset}` : apiProps.endpoint + `?offset=${offset}`})
-        console.log("Calling API...")
+        // console.log("Calling API...")
     }, [flags])
 
     useEffect(() => {
@@ -34,7 +42,7 @@ export const useInfiniteScrollApiCall = <T extends Id, K extends Id & UI> ({ con
         if (state.loading || !state.result) return
         const result = state.result;
         if (result.error) {
-            console.log(result.error)
+            displayError(result.error)
             return
         }
         if (!result.data || typeof result.data === "string") return
@@ -45,11 +53,11 @@ export const useInfiniteScrollApiCall = <T extends Id, K extends Id & UI> ({ con
         }
         setData(prev => {
             data = data.filter(s => !seen.includes(s.id as number))
-            console.log("Added " + data.length + " elements")
+            // console.log("Added " + data.length + " elements")
             setSeen(prev => [...prev, ...data.map(d => d.id)])
             return [...prev, ...data.map(s => convert_to_UI<K>(s))]
         })
     }, [state])
 
-    return { data, state }
+    return { data, state, reset }
 }

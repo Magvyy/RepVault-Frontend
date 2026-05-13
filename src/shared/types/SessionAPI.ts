@@ -41,8 +41,17 @@ export interface TemplateSessionResponse extends Id {
 
 export interface ActiveSessionResponse extends Id {
     name: string
+    description?: string
     exercises: ActiveExerciseResponse[]
     start: string
+}
+
+export interface ActiveSessionRequest {
+    name: string
+    description?: string
+    exercises: ExerciseRequest[]
+    start: string
+    public: boolean
 }
 
 export interface SessionResponse extends Id {

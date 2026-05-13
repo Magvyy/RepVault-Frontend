@@ -116,6 +116,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/types/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["getUserTypes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/types/sets": {
         parameters: {
             query?: never;
@@ -260,6 +276,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/auth/me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["authenticate"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -363,15 +395,18 @@ export interface components {
         ActiveExerciseRequestDTO: {
             /** Format: int64 */
             id?: number;
+            description?: string;
             /** @enum {string} */
             type?: ActiveExerciseRequestDTOType;
             sets?: components["schemas"]["ActiveSetRequestDTO"][];
         };
         ActiveSessionRequestDTO: {
             name?: string;
+            description?: string;
             exercises?: components["schemas"]["ActiveExerciseRequestDTO"][];
             /** Format: date-time */
             start?: string;
+            public?: boolean;
         };
         ActiveSetRequestDTO: {
             /** Format: int64 */
@@ -382,6 +417,19 @@ export interface components {
             reps?: number;
             /** Format: double */
             weight?: number;
+        };
+        UserRelationResponseDTO: {
+            /** Format: int64 */
+            id?: number;
+            userName?: string;
+            canAdd?: boolean;
+            canAccept?: boolean;
+        };
+        UserTypeDTO: {
+            /** Format: int64 */
+            id?: number;
+            /** @enum {string} */
+            type?: UserTypeDTOType;
         };
         SetTypeDTO: {
             /** Format: int64 */
@@ -443,7 +491,7 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content: {
-                    "*/*": components["schemas"]["UserResponseDTO"];
+                    "*/*": components["schemas"]["UserRelationResponseDTO"];
                 };
             };
         };
@@ -778,6 +826,26 @@ export interface operations {
             };
         };
     };
+    getUserTypes: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": components["schemas"]["UserTypeDTO"][];
+                };
+            };
+        };
+    };
     getSetTypes: {
         parameters: {
             query?: never;
@@ -957,6 +1025,26 @@ export interface operations {
             path: {
                 id: number;
             };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description OK */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "*/*": Record<string, never>;
+                };
+            };
+        };
+    };
+    authenticate: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
             cookie?: never;
         };
         requestBody?: never;
@@ -1345,6 +1433,11 @@ export enum ActiveSetRequestDTOType {
     FAILURE = "FAILURE",
     DROP_SET = "DROP_SET",
     SUPER_SET = "SUPER_SET"
+}
+export enum UserTypeDTOType {
+    ME = "ME",
+    OTHER = "OTHER",
+    FRIEND = "FRIEND"
 }
 export enum SetTypeDTOType {
     NORMAL = "NORMAL",

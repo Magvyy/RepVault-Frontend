@@ -1,11 +1,12 @@
 import { useActiveSession } from "@/app/ContextProvider";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { useApiCall } from "@/shared/hooks/handleApiCall";
+import { useApiCall } from "@/shared/hooks/useApiCall";
 import formatEnumToString from "@/shared/services/formatEnumToString";
 import { convert_to_UI } from "@/shared/types/Common";
-import { type SessionOverviewResponse, type SessionResponse, type UISession, type UISessionOverview } from "@/shared/types/SessionAPI";
+import { type SessionOverviewResponse, type SessionResponse, type UISessionOverview } from "@/shared/types/SessionAPI";
 import { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 
 
@@ -15,6 +16,7 @@ export default function SessionsPage() {
     const { state: sessionState, handleApiCall: handleSessionApiCall } = useApiCall<SessionResponse>()
     const [sessions, setSessions] = useState<UISessionOverview[]>([])
     const { activeSession, setActiveSession } = useActiveSession()
+    const navigate = useNavigate()
 
     useEffect(() => {
         handleSessionsApiCall({
@@ -67,7 +69,7 @@ export default function SessionsPage() {
                 {sessions.map(s => {
                     const exercises = s.exercises.map(e => formatEnumToString(e as unknown as string))
                     return (
-                        <Card key={s.clientId} className="p-2 w-[200px]" onClick={(e) => window.location.href = `/sessions/templates/${s.id}`}>
+                        <Card key={s.clientId} className="p-2 w-[200px]" onClick={(e) => navigate(`/sessions/templates/${s.id}`)}>
                             <h1>{s.name}</h1>
                             <h2 className="text-gray-500">{exercises.slice(1).reduce((acc, cur) => acc + ", " + cur, exercises[0])}</h2>
                             <Button onClick={(e) => {

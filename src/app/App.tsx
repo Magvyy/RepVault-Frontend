@@ -9,34 +9,51 @@ import { ThemeProvider } from "@/components/theme-provider"
 import Layout from './Layout';
 import SessionsPage from '@/pages/sessions/components/SessionsPage';
 import SessionTemplatePage from '@/pages/sessions/components/SessionTemplatePage';
-import ContextProvider from './ContextProvider';
+import { ContextProvider } from './ContextProvider';
 import ActiveSessionPage from '@/pages/sessions/components/ActiveSessionPage';
 import SessionPage from '@/pages/sessions/components/SessionPage';
 import UserPage from '@/pages/users/components/UserPage';
+import ProtectedRoute from './ProtectedRoute';
 
 export default function App() {
 
-  return (
-    <ContextProvider>
-        <Layout>
+    return (
+        <ContextProvider>
             <ThemeProvider defaultTheme="dark" storageKey="vite-ui-theme">
                 <BrowserRouter>
-                    <div className="w-full h-full overflow-auto scrollbar-hide">
+                    <Layout>
                         <Routes>
                             <Route path="/" element={<HomePage />} />
                             <Route path="/login" element={<LoginPage />} />
                             <Route path="/register" element={<RegisterPage />} />
-                            <Route path="/sessions/templates/create" element={<CreateSessionPage />} />
-                            <Route path="/sessions/templates" element={<SessionsPage />} />
-                            <Route path="/sessions/:id" element={<SessionPage />} />
-                            <Route path="/sessions/templates/:id" element={<SessionTemplatePage />} />
-                            <Route path="/active" element={<ActiveSessionPage />} />
                             <Route path="/users/:id" element={<UserPage />} />
+                            <Route path="/sessions/:id" element={<SessionPage />} />
+
+                            // Protected routes
+                            <Route path="/sessions/templates/create" element={
+                                <ProtectedRoute>
+                                    <CreateSessionPage />
+                                </ProtectedRoute>
+                            } />
+                            <Route path="/sessions/templates" element={
+                                <ProtectedRoute>
+                                    <SessionsPage />
+                                </ProtectedRoute>
+                                } />
+                            <Route path="/sessions/templates/:id" element={
+                                <ProtectedRoute>
+                                    <SessionTemplatePage />
+                                </ProtectedRoute>
+                                } />
+                            <Route path="/active" element={
+                                <ProtectedRoute>
+                                    <ActiveSessionPage />
+                                </ProtectedRoute>
+                                } />
                         </Routes>
-                    </div>
+                    </Layout>
                 </BrowserRouter>
             </ThemeProvider>
-        </Layout>
-    </ContextProvider>
-  )
+        </ContextProvider>
+    )
 }
